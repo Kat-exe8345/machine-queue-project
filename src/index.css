@@ -12,8 +12,6 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color-scheme: dark;
-  --bg-panel: rgba(8, 16, 29, 0.78);
-  --bg-panel-strong: rgba(13, 24, 42, 0.9);
   --border: rgba(175, 206, 255, 0.14);
   --border-strong: rgba(160, 193, 255, 0.24);
   --text-main: #ecf5ff;
@@ -76,7 +74,7 @@ input:focus {
 }
 
 .app-shell {
-  width: min(1360px, calc(100% - 2rem));
+  width: min(1080px, calc(100% - 2rem));
   margin: 0 auto;
   padding: 2rem 0 3rem;
 }
@@ -154,17 +152,154 @@ input:focus {
 
 .workspace {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(360px, 0.8fr);
-  gap: 1.25rem;
-}
-
-.column {
-  display: grid;
+  grid-template-columns: 1fr;
   gap: 1.25rem;
 }
 
 .card {
   padding: 1.25rem;
+}
+
+.single-column {
+  grid-template-columns: 1fr;
+}
+
+.setup-card,
+.choice-card,
+.results-card {
+  display: grid;
+  gap: 1rem;
+}
+
+.choice-grid,
+.sample-picker,
+.input-row {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.choice-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.choice-main {
+  min-height: 64px;
+}
+
+.sample-picker {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.sample-picker .active {
+  outline: 2px solid rgba(124, 243, 196, 0.5);
+}
+
+.input-row {
+  grid-template-columns: 1fr auto;
+  align-items: end;
+}
+
+.text-button {
+  background: transparent;
+  color: var(--accent-strong);
+  padding: 0;
+  font-weight: 700;
+}
+
+.text-button:disabled {
+  opacity: 0.55;
+}
+
+.helper-copy,
+.status-message {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.machine-list-card,
+.result-block {
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.machine-list,
+.selected-list,
+.steps-list {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.machine-list {
+  display: grid;
+  gap: 0.65rem;
+  list-style: none;
+  padding-left: 0;
+}
+
+.machine-list li {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 0.8rem 0.95rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.machine-list li strong {
+  min-width: 120px;
+}
+
+.power-section {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.power-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.power-section-header h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.power-preview {
+  margin: 0;
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+
+.selected-list,
+.steps-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.power-value {
+  margin: 0;
+  font-size: 2.4rem;
+  font-weight: 700;
+}
+
+.steps-block {
+  scroll-margin-top: 1rem;
+}
+
+.status-message {
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(124, 243, 196, 0.2);
+  background: rgba(124, 243, 196, 0.08);
 }
 
 .card-title-row {
@@ -208,7 +343,8 @@ input:focus {
 
 .primary-button,
 .secondary-button,
-.ghost-button {
+.ghost-button,
+.choice-button {
   padding: 0.9rem 1rem;
   border-radius: 14px;
   font-weight: 700;
@@ -229,6 +365,17 @@ input:focus {
   color: var(--text-main);
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-strong);
+}
+
+.choice-button {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-strong);
+}
+
+.choice-button.active {
+  border-color: rgba(124, 243, 196, 0.5);
+  background: rgba(124, 243, 196, 0.1);
 }
 
 .primary-button:hover,
@@ -422,7 +569,10 @@ input:focus {
 
 @media (max-width: 1100px) {
   .hero,
-  .workspace {
+  .workspace,
+  .choice-grid,
+  .sample-picker,
+  .input-row {
     grid-template-columns: 1fr;
   }
 
@@ -438,12 +588,9 @@ input:focus {
   }
 
   .hero-stats,
-  .heap-summary,
-  .results-strip,
-  .sample-panel,
-  .heap-array-head,
-  .roster-list li,
-  .log-line {
+  .choice-grid,
+  .sample-picker,
+  .input-row {
     grid-template-columns: 1fr;
   }
 
