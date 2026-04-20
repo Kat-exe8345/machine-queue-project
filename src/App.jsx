@@ -158,8 +158,29 @@ export default function App() {
     setStatusMessage(`${name} has been added.`)
   }
 
+  function handleDeleteMachine(id) {
+    setCustomMachines((currentMachines) => {
+      const nextMachines = currentMachines.filter((machine) => machine.id !== id)
+
+      clearResults()
+
+      if (nextMachines.length === 0) {
+        setStatusMessage('Please add at least one machine before processing.')
+      } else {
+        setStatusMessage('Machine removed.')
+      }
+
+      return nextMachines
+    })
+  }
+
   function startProcessing() {
-    if (isProcessing || activeMachines.length === 0) {
+    if (isProcessing) {
+      return
+    }
+
+    if (activeMachines.length === 0) {
+      setStatusMessage('Please add at least one machine before processing.')
       return
     }
 
@@ -186,22 +207,22 @@ export default function App() {
 
   function renderChoiceScreen() {
     return (
-      <section className="card choice-card">
-        <div className="card-title-row">
-          <h2>Priority Queue Demo</h2>
-          <span className="badge">Simple mode</span>
+      <section className="mb-6 rounded-md border border-gray-200 bg-white p-4">
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <h2 className="text-base font-medium">Priority Queue Demo</h2>
+          <span className="text-sm text-gray-500">Simple mode</span>
         </div>
 
-        <p className="helper-copy">
-          Choose how you want to begin. Sample mode loads a ready-made story. Custom mode lets
-          you enter your own machines.
+        <p className="text-sm text-gray-600">
+          Choose how you want to begin. Sample mode loads ready-made machine data. Custom mode lets
+          you enter your own machine data.
         </p>
 
-        <div className="choice-grid">
-          <button className="primary-button choice-main" type="button" onClick={chooseSampleMode}>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <button className="bg-black px-4 py-2 text-sm text-white rounded-md" type="button" onClick={chooseSampleMode}>
             Load Sample Data
           </button>
-          <button className="secondary-button choice-main" type="button" onClick={chooseCustomMode}>
+          <button className="bg-blue-600 px-4 py-2 text-sm text-white rounded-md" type="button" onClick={chooseCustomMode}>
             Add My Own Machines
           </button>
         </div>
@@ -211,20 +232,20 @@ export default function App() {
 
   function renderSampleScreen() {
     return (
-      <section className="card setup-card">
-        <div className="card-title-row">
-          <h2>Load Sample Data</h2>
-          <button className="text-button" type="button" onClick={resetWorkspace} disabled={isProcessing}>
+      <section className="mb-6 rounded-md border border-gray-200 bg-white p-4">
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <h2 className="text-base font-medium">Load Sample Data</h2>
+          <button className="text-sm text-blue-600" type="button" onClick={resetWorkspace} disabled={isProcessing}>
             Back
           </button>
         </div>
 
-        <p className="helper-copy">Pick one story, review the machines, and then start processing.</p>
+        <p className="text-sm text-gray-600">Pick one story, review the machines, and then start processing.</p>
 
-        <div className="sample-picker">
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
           <button
             type="button"
-            className={sampleKey === 'normal' ? 'choice-button active' : 'choice-button'}
+            className={`rounded-md px-4 py-2 text-sm text-white ${sampleKey === 'normal' ? 'bg-blue-700' : 'bg-blue-600'}`}
             onClick={() => loadSample('normal')}
             disabled={isProcessing}
           >
@@ -232,7 +253,7 @@ export default function App() {
           </button>
           <button
             type="button"
-            className={sampleKey === 'limited' ? 'choice-button active' : 'choice-button'}
+            className={`rounded-md px-4 py-2 text-sm text-white ${sampleKey === 'limited' ? 'bg-blue-700' : 'bg-blue-600'}`}
             onClick={() => loadSample('limited')}
             disabled={isProcessing}
           >
@@ -240,7 +261,7 @@ export default function App() {
           </button>
           <button
             type="button"
-            className={sampleKey === 'tied' ? 'choice-button active' : 'choice-button'}
+            className={`rounded-md px-4 py-2 text-sm text-white ${sampleKey === 'tied' ? 'bg-blue-700' : 'bg-blue-600'}`}
             onClick={() => loadSample('tied')}
             disabled={isProcessing}
           >
@@ -248,13 +269,13 @@ export default function App() {
           </button>
         </div>
 
-        <div className="input-row">
-          <label>
-            <span>Total Available Power</span>
-            <input type="number" value={totalPower} readOnly />
+        <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
+          <label className="grid gap-1">
+            <span className="text-sm">Total Available Power</span>
+            <input className="rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-600 focus:outline-none" type="number" value={totalPower} readOnly />
           </label>
           <button
-            className="primary-button"
+            className="rounded-md bg-black px-4 py-2 text-sm text-white"
             type="button"
             onClick={startProcessing}
             disabled={isProcessing || activeMachines.length === 0}
@@ -263,14 +284,25 @@ export default function App() {
           </button>
         </div>
 
-        <div className="machine-list-card">
-          <h3>Machines ready to process</h3>
-          <ul className="machine-list">
+        <div className="mt-4 rounded-md border border-gray-200 p-4">
+          <h3 className="text-base font-medium">Added Machines</h3>
+          <ul className="mt-3 grid gap-2">
             {activeMachines.map((machine) => (
-              <li key={machine.id}>
-                <strong>{machine.name}</strong>
-                <span>Criticality {machine.criticality}</span>
-                <span>Power {machine.powerRequired}</span>
+              <li key={machine.id} className="flex items-center justify-between border-b border-gray-200 py-2">
+                <div className="grid gap-0.5">
+                  <strong className="text-sm font-medium">{machine.name}</strong>
+                  <span className="text-sm text-gray-600">Criticality: {machine.criticality}</span>
+                  <span className="text-sm text-gray-600">Power: {machine.powerRequired}</span>
+                </div>
+                <button
+                  className="ml-2 cursor-pointer text-red-600"
+                  type="button"
+                  onClick={() => handleDeleteMachine(machine.id)}
+                  aria-label={`Delete ${machine.name}`}
+                  disabled={isProcessing}
+                >
+                  🗑️
+                </button>
               </li>
             ))}
           </ul>
@@ -281,18 +313,19 @@ export default function App() {
 
   function renderCustomScreen() {
     return (
-      <section className="card setup-card">
-        <div className="card-title-row">
-          <h2>Add My Own Machines</h2>
-          <button className="text-button" type="button" onClick={resetWorkspace} disabled={isProcessing}>
+      <section className="mb-6 rounded-md border border-gray-200 bg-white p-4">
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <h2 className="text-base font-medium">Add My Own Machines</h2>
+          <button className="text-sm text-blue-600" type="button" onClick={resetWorkspace} disabled={isProcessing}>
             Back
           </button>
         </div>
 
-        <form className="machine-form" onSubmit={addMachine}>
-          <label>
-            <span>Machine Name</span>
+        <form className="grid gap-3" onSubmit={addMachine}>
+          <label className="grid gap-1">
+            <span className="text-sm">Machine Name</span>
             <input
+              className="rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-600 focus:outline-none"
               type="text"
               value={machineForm.name}
               onChange={(event) => updateFormField('name', event.target.value)}
@@ -301,9 +334,10 @@ export default function App() {
             />
           </label>
 
-          <label>
-            <span>Criticality</span>
+          <label className="grid gap-1">
+            <span className="text-sm">Criticality</span>
             <input
+              className="rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-600 focus:outline-none"
               type="number"
               min="0"
               step="1"
@@ -314,9 +348,10 @@ export default function App() {
             />
           </label>
 
-          <label>
-            <span>Power Required</span>
+          <label className="grid gap-1">
+            <span className="text-sm">Power Required</span>
             <input
+              className="rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-600 focus:outline-none"
               type="number"
               min="0"
               step="1"
@@ -327,19 +362,20 @@ export default function App() {
             />
           </label>
 
-          <button className="secondary-button" type="submit" disabled={isProcessing}>
+          <button className="rounded-md bg-blue-600 px-4 py-2 text-sm text-white" type="submit" disabled={isProcessing}>
             Add Machine
           </button>
 
-          <div className="power-section">
-            <div className="power-section-header">
-              <h3>Set Total Available Power</h3>
-              <span className="badge">Required</span>
+          <div className="mt-2 grid gap-3 rounded-md border border-gray-200 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-base font-medium">Set Total Available Power</h3>
+              <span className="text-sm text-gray-500">Required</span>
             </div>
 
-            <label htmlFor="power-input">
-              <span>Total Available Power</span>
+            <label htmlFor="power-input" className="grid gap-1">
+              <span className="text-sm">Total Available Power</span>
               <input
+                className="rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-600 focus:outline-none"
                 id="power-input"
                 type="number"
                 min="0"
@@ -351,12 +387,12 @@ export default function App() {
               />
             </label>
 
-            <p className="power-preview">Current Total Power: {isValidTotalPower(totalPower) ? totalPower : 0}</p>
+            <p className="text-sm text-gray-600">Current Total Power: {isValidTotalPower(totalPower) ? totalPower : 0}</p>
           </div>
 
-          <div className="input-row">
+          <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
             <button
-              className="primary-button"
+              className="rounded-md bg-black px-4 py-2 text-sm text-white"
               type="button"
               onClick={startProcessing}
               disabled={isProcessing || activeMachines.length === 0}
@@ -366,17 +402,28 @@ export default function App() {
           </div>
         </form>
 
-        <div className="machine-list-card">
-          <h3>Machines ready to process</h3>
+        <div className="mt-4 rounded-md border border-gray-200 p-4">
+          <h3 className="text-base font-medium">Added Machines</h3>
           {activeMachines.length === 0 ? (
-            <p className="empty-state">No machines added yet.</p>
+            <p className="mt-3 text-sm text-gray-600">No machines added yet.</p>
           ) : (
-            <ul className="machine-list">
+            <ul className="mt-3 grid gap-2">
               {activeMachines.map((machine) => (
-                <li key={machine.id}>
-                  <strong>{machine.name}</strong>
-                  <span>Criticality {machine.criticality}</span>
-                  <span>Power {machine.powerRequired}</span>
+                <li key={machine.id} className="flex items-center justify-between border-b border-gray-200 py-2">
+                  <div className="grid gap-0.5">
+                    <strong className="text-sm font-medium">{machine.name}</strong>
+                    <span className="text-sm text-gray-600">Criticality: {machine.criticality}</span>
+                    <span className="text-sm text-gray-600">Power: {machine.powerRequired}</span>
+                  </div>
+                  <button
+                    className="ml-2 cursor-pointer text-red-600"
+                    type="button"
+                    onClick={() => handleDeleteMachine(machine.id)}
+                    aria-label={`Delete ${machine.name}`}
+                    disabled={isProcessing}
+                  >
+                    🗑️
+                  </button>
                 </li>
               ))}
             </ul>
@@ -387,80 +434,91 @@ export default function App() {
   }
 
   return (
-    <div className="app-shell">
-      <header className="hero">
+    <div className="min-h-screen bg-white text-black font-sans">
+      <div className="mx-auto mt-10 w-full max-w-6xl px-6">
+      <header className="mb-6 grid gap-4">
         <div>
-          <p className="eyebrow">Priority Queue Demo</p>
-          <h1>Easy machine selection story</h1>
-          <p className="hero-copy">
-            Choose sample data or enter your own machines, then read a plain-language explanation
+          <h1 className="text-2xl font-semibold mb-2">Priority Queue / Min heap Demo</h1>
+          <p className="text-md text-gray-600">
+            Choose sample data or enter your own machine data, then read a plain-language explanation
             of every selection and skip.
           </p>
         </div>
 
-        <div className="hero-stats">
-          <div className="stat-card">
-            <span>Loaded machines</span>
-            <strong>{summary.machineCount}</strong>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <div className="rounded-md border border-gray-200 p-4">
+            <span className="text-sm text-gray-600">Loaded machines</span>
+            <strong className="mt-1 block text-lg font-semibold">{summary.machineCount}</strong>
           </div>
-          <div className="stat-card">
-            <span>Selected</span>
-            <strong>{summary.selectedCount}</strong>
+          <div className="rounded-md border border-gray-200 p-4">
+            <span className="text-sm text-gray-600">Selected</span>
+            <strong className="mt-1 block text-lg font-semibold">{summary.selectedCount}</strong>
           </div>
-          <div className="stat-card">
-            <span>Status</span>
-            <strong>{isProcessing ? 'Working' : 'Ready'}</strong>
+          <div className="rounded-md border border-gray-200 p-4">
+            <span className="text-sm text-gray-600">Status</span>
+            <strong className="mt-1 block text-lg font-semibold">{isProcessing ? 'Working' : 'Ready'}</strong>
           </div>
         </div>
       </header>
 
-      <main className="workspace single-column">
-        <section className="column">
-          {mode === null ? renderChoiceScreen() : null}
-          {mode === 'sample' ? renderSampleScreen() : null}
-          {mode === 'custom' ? renderCustomScreen() : null}
+      <main>
+        {mode === null ? (
+          <section className="mb-6">{renderChoiceScreen()}</section>
+        ) : (
+          <section className="grid gap-8 md:grid-cols-2">
+            <div className="space-y-4">
+              {mode === 'sample' ? renderSampleScreen() : null}
+              {mode === 'custom' ? renderCustomScreen() : null}
+            </div>
 
-          {statusMessage ? <p className="status-message">{statusMessage}</p> : null}
+            <div className="space-y-4">
+              <section ref={resultsRef} className="rounded-md border border-gray-200 bg-white p-4">
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <h2 className="text-base font-medium">Results</h2>
+                  <button className="text-sm text-blue-600" type="button" onClick={clearResults} disabled={isProcessing}>
+                    Clear Results
+                  </button>
+                </div>
 
-          {steps.length > 0 ? (
-            <section className="card results-card" ref={resultsRef}>
-              <div className="card-title-row">
-                <h2>Final Result</h2>
-                <button className="text-button" type="button" onClick={clearResults} disabled={isProcessing}>
-                  Clear Results
-                </button>
-              </div>
+                <div className="mb-4 rounded-md border border-gray-200 p-4">
+                  <h3 className="text-base font-medium">Selected Machines</h3>
+                  {selectedMachines.length === 0 ? (
+                    <p className="mt-2 text-sm text-gray-600">No machines selected yet.</p>
+                  ) : (
+                    <ol className="mt-2 space-y-1 pl-5 text-sm">
+                      {selectedMachines.map((machine) => (
+                        <li key={machine.id} className="flex items-center gap-2 py-1">✅ {machine.name}</li>
+                      ))}
+                    </ol>
+                  )}
+                </div>
 
-              <div className="result-block">
-                <h3>Selected Machines</h3>
-                {selectedMachines.length === 0 ? (
-                  <p className="empty-state">No machines were selected.</p>
-                ) : (
-                  <ol className="selected-list">
-                    {selectedMachines.map((machine) => (
-                      <li key={machine.id}>{machine.name}</li>
-                    ))}
-                  </ol>
-                )}
-              </div>
+                <div className="mb-4 rounded-md border border-gray-200 p-4">
+                  <h3 className="text-base font-medium">Remaining Power</h3>
+                  <p className="mt-1 text-lg font-semibold">{remainingPower}</p>
+                </div>
 
-              <div className="result-block">
-                <h3>Remaining Power</h3>
-                <p className="power-value">{remainingPower}</p>
-              </div>
+                {statusMessage ? <p className="text-sm text-gray-600">{statusMessage}</p> : null}
+              </section>
 
-              <div className="result-block steps-block">
-                <h3>Step-by-Step Explanation</h3>
-                <ol className="steps-list">
-                  {steps.map((step) => (
-                    <li key={step}>{step}</li>
-                  ))}
-                </ol>
-              </div>
-            </section>
-          ) : null}
-        </section>
+              <section className="rounded-md border border-gray-200 bg-gray-100 p-4">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <h3 className="text-base font-medium">Logs</h3>
+                  <span className="text-sm text-gray-500">max 64 lines visible</span>
+                </div>
+                <div className="max-h-64 overflow-y-auto space-y-2 text-sm font-mono">
+                  {steps.length === 0 ? (
+                    <p className="text-gray-600">Steps will appear here after processing.</p>
+                  ) : (
+                    steps.map((step) => <p key={step} className="border-b border-gray-200 pb-2">{step}</p>)
+                  )}
+                </div>
+              </section>
+            </div>
+          </section>
+        )}
       </main>
+      </div>
     </div>
   )
 }
