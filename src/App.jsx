@@ -240,7 +240,7 @@ export default function App() {
           </button>
         </div>
 
-        <p className="text-sm text-gray-600">Pick one story, review the machines, and then start processing.</p>
+        <p className="text-sm text-gray-600">Review the machines, and then start processing.</p>
 
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           <button
